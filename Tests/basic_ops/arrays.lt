@@ -1,0 +1,9 @@
+/*
+Test building and editing lists
+*/
+
+list mylist = list();
+list.add(5);
+list.add(true);
+
+print(list[0]);
