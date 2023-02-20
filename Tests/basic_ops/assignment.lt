@@ -1,0 +1,17 @@
+/*
+Assign and declare basic types
+*/
+int 1
+float 1.1
+str "string"
+bool True
+
+
+int var1 = 5
+float var2 = 5.5
+str var3 = "string"
+bool var4 = True
+
+print(var1)
+print(var2)
+print(var3)
