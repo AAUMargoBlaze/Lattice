@@ -1,0 +1,29 @@
+Start      -> Statements
+Statements -> Statement Statements | EPSILON
+Statement  -> VarDecl |GraphDecl | VarAssign | FuncDef | FuncCall ;| GraphManip | Loop | IFblock
+VarDecl    -> Type idVar ;
+GraphDecl -> graph idGraph = new();
+Type       -> str | int | float | bool
+VarAssign  -> idVar = AssignVal;
+AssignVal  -> OperationHead OperationTail;
+OperationHead -> num | string | boolNum | idVar | FuncCall
+OperationTail -> Operator OperationEnd  | EPSILON
+OperationEnd -> AssignVal | ( AssignVal)
+Operator   -> plus | minus | times
+FuncDef    -> def FuncType funcName ( ListArgs )
+FuncType -> Type | void
+ListArgs   -> Type idVar OtherArgs
+OtherArgs -> , Type idVar OtherArgs
+FuncCall   -> funcName ( ListParam )
+ListParam -> idVar OtherParam
+OtherParam -> , idVar OtherParam | EPSILON
+GraphManip -> idGraph ( ListGraphOp )
+ListGraphOp -> GraphOp OtherGraphOp
+OtherGraphOp -> GraphOp OtherGraphOp | EPSILON
+GraphOp -> addNode | addRel | addRef
+addNode -> clone idVar ;
+Loop -> while ( Assertion ) { Statements }
+IFblock -> if ( Assertion) { Statements } ElseBlock
+ElseBlock -> else { Statements} | EPSILON
+Assertion -> idVar OpComp AssignVal | boolNum
+OpComp -> eq | leq | geq | gt | lt | neq
