@@ -14,7 +14,7 @@ With this in mind we build a graph of the following:
 import graphviz
 
 if __name__ == "__main__":
-    dot = graphviz.Digraph('pathfinding')
+    dot = graphviz.Digraph('informed_pathfinding')
 
     with dot.subgraph() as rank1:
         rank1.attr(rank='same')
