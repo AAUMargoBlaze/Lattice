@@ -1,0 +1,32 @@
+int iterator = 2;
+int max = 100;
+
+graph even {}
+graph odd {}
+int previousEven = iterator;
+while(iterator < max)
+{
+    if(iterator % 2 == 0)
+    {
+        even
+        {
+            clone iterator
+            if(iterator == 0)
+            {
+                previousEven = iterator;
+            }
+        }
+    }
+    else
+    {
+        odd
+        {
+           clone iterator
+           if(iterator != 0)
+           {
+           }
+        }
+    }
+    iterator = iterator + 1;
+}
+

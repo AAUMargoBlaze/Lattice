@@ -1,0 +1,51 @@
+
+graph numbersTree {
+    ref int zero = 0;
+    graph positive {
+        ref zero;
+
+        ref int one = 1;
+        list rels = relationships(one);
+        ref int two = 2;
+
+        zero |"left",0-> one;
+        zero |"right",0-> two;
+
+        ref int three = 3;
+        ref int five = 5;
+
+        one |"left",0-> three;
+        one |"right",0-> five;
+
+        ref int four = 4;
+        ref int six = 6;
+
+        two |"left",0-> four;
+        two |"right",0-> six;
+    }
+
+    graph positive {
+        ref zero;
+
+        ref int n_one = 1;
+        ref int n_two = 2;
+
+        zero |"right",0-> n_one;
+        zero |"left",0-> n_two;
+
+        ref int n_three = 3;
+        ref int n_five = 5;
+
+        n_one |"right",0-> n_three;
+        n_one |"left",0-> n_five;
+
+        ref int n_four = 4;
+        ref int n_six = 6;
+
+        n_two |"right",0-> n_four;
+        n_two |"left",0-> n_six;
+    }
+}
+graph g4 {
+clone numbersTree
+}

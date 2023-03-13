@@ -1,0 +1,18 @@
+/*
+if else branching
+*/
+
+bool mybool = true;
+
+if (mybool)
+{
+    if (!mybool) {
+        print('branch 1');
+    }
+    else {
+        print('branch 2');
+    }
+}
+else {
+    print('branch 3');
+}

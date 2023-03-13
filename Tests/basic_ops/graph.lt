@@ -1,0 +1,67 @@
+/*
+Represent a graph of the following:
+ G3 ----------------------------|
+   |  G1 -----------| G2 ----|  |
+   |    |  A        |    A   |  |
+   |    |  ^        |        |  |
+   |    |  | -- > C | -- > D |  |
+   |    |  v        |        |  |
+   |    |  B <----- | --- E  |  |
+   |    |-----------|--------|  |
+   |----------------------------|
+
+ */
+
+ // global node
+ str a = "a";
+
+ // build first graph
+ graph g1 {
+     ref a;
+     str b = "b";
+     str c = "c";
+
+     rel ab = a | "ab",5 -> b;
+     rel ac = a | "ac",5 -> c;
+     rel bc = b <- "bc",5 -> c;
+ }
+
+ // build second graph
+ graph g2 {
+     ref a;
+     str d = "d";
+ }
+
+
+ int a =5;
+ int b =5;
+ int c =5;
+ graph g1;
+ graph g2;
+
+ g1.add(a);
+ g1.add(b);
+
+ g2.add(a);
+ g2.add(c);
+
+ g2.add_rel( a <-> b);
+ g2.add_rel( a <-> c);
+ g2.add_rel( b <-> c);
+
+ a <-> c;
+
+r = relationships(a, g);
+
+ // add to node 2
+ g2 {
+     str e = "e";
+ }
+
+ // hash to merge two graphs (there are NO relationships between them)
+ g3 = g1 union g2
+
+ // add directed relationship g2 e -> g1 b by using the parent graph g3
+ g3 {
+     rel eb = e | "eb",5 -> b
+ }

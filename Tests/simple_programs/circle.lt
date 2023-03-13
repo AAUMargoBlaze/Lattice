@@ -1,0 +1,15 @@
+graph circle
+{
+    ref int one = 1;
+    ref int two = 2;
+    ref int three = 3;
+    ref int four = 4;
+    ref int five = 5;
+
+    ref five = 6;
+
+    one |"12"0-> two;
+    two |"23"0-> three;
+    three |"34"0-> four;
+    four |"45"0-> five;
+}
