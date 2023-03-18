@@ -39,11 +39,11 @@
     KEYWORD_FALSE="false"
 
 
-
+    number='regexp:\d+'
     space='regexp:\s+'
     id="regexp:\w+"
     string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
-    number="regexp:\d+"
+
     line_comment="regexp://.*"
     block_comment="regexp:/\*(.|\n)*\*/"
     epsilon=""
@@ -57,16 +57,17 @@
   Start        ::= Statements
   Statements   ::= Statement Statements*
   Statement    ::= VarDecl | GraphDecl | VarAssignOrGraphManip | OP_PRINT
-  VarDecl      ::= Type id SEMICOLON
-  GraphDecl    ::= TYPE_GRAPH id LEFT_BRACE Statements RIGHT_BRACE;
-  Type         ::= TYPE_STRING | TYPE_FLOAT | TYPE_BOOL | TYPE_INT |
+  VarDecl      ::= Type id VarDeclTail
+  VarDeclTail ::= TailVarAssign | SEMICOLON
+  GraphDecl    ::= TYPE_GRAPH id TailGraphManip;
+  Type         ::= TYPE_STRING | TYPE_FLOAT | TYPE_BOOL | TYPE_INT | TYPE_GRAPH
   VarAssignOrGraphManip ::= id TailVarAssignOrGraphManip
   TailVarAssignOrGraphManip ::= TailVarAssign | TailGraphManip
-  TailVarAssign  ::= assign AssignVal SEMICOLON
-  AssignVal ::= num | string
+  TailVarAssign  ::= OP_ASSIGN AssignVal SEMICOLON
+  AssignVal ::= number | string
   TailGraphManip   ::= LEFT_BRACE ListGraphOp RIGHT_BRACE
-  ListGraphOp  ::= GraphOp OtherGraphOp
-  OtherGraphOp ::= EPSILON | GraphOp OtherGraphOp
-  GraphOp      ::= AddRel | AddClone
-  AddClone     ::= clone id SEMICOLON
-  AddRel       ::= id OP_REL_LEFT num COMMA string OP_REL_RIGHT id
+  ListGraphOp  ::= GraphOp ListGraphOp*
+  GraphOp      ::= AddRel | AddClone | AddRef
+  AddRef       ::= OP_REF id SEMICOLON
+  AddClone     ::= OP_CLONE id SEMICOLON
+  AddRel       ::= id OP_REL_LEFT number COMMA string OP_REL_RIGHT id
