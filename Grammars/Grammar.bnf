@@ -56,7 +56,8 @@
 
   Start        ::= Statements
   Statements   ::= Statement Statements*
-  Statement    ::= VarDecl | GraphDecl | VarAssignOrGraphManip | OP_PRINT
+  Statement    ::= VarDecl | GraphDecl | VarAssignOrGraphManip | PrintStatement
+  PrintStatement ::= OP_PRINT (id | string) SEMICOLON
   VarDecl      ::= Type id VarDeclTail
   VarDeclTail ::= TailVarAssign | SEMICOLON
   GraphDecl    ::= TYPE_GRAPH id TailGraphManip;
