@@ -92,7 +92,8 @@ class Graph:
         For now, this only displays visible nodes (those stored in self._nodes)
         """
         display_data = display_data or self._default_display_data
-        dot = graphviz.Digraph(str(self.fingerprint))
+        runtime_fingerprint = uuid.uuid4()
+        dot = graphviz.Digraph(str(runtime_fingerprint))
         for node in self.nodes:
             if display_data:
                 origin_label = str(node.data)
