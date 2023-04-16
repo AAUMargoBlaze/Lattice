@@ -10,6 +10,7 @@ NOTES:
 TODO:
 - Find a more elegant way to reference nodes in a graph for operations such as finding edges
 """
+import uuid
 from typing import Set, List, Dict
 
 import graphviz
@@ -34,6 +35,7 @@ class Graph:
 
     def __init__(self):
         self._nodes = set()  # initialise nodes as an empty set
+        self.fingerprint = uuid.uuid4()
 
     def add_nodes(self, *hidden_nodes: Node, **nodes: Node) -> List[Node]:
         """Add nodes to a graph
@@ -90,7 +92,7 @@ class Graph:
         For now, this only displays visible nodes (those stored in self._nodes)
         """
         display_data = display_data or self._default_display_data
-        dot = graphviz.Digraph()
+        dot = graphviz.Digraph(str(self.fingerprint))
         for node in self.nodes:
             if display_data:
                 origin_label = str(node.data)
@@ -107,3 +109,7 @@ class Graph:
     def search_djikstra(self, start_node, end_node):
         """Perform a djikstra search between two nodes"""
         pass
+
+    def __str__(self):
+        self.visualise()
+        return "​"

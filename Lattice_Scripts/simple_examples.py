@@ -37,5 +37,7 @@ graph2 = build_binary_tree(20)
 if __name__ == "__main__":
     # We have created several graphs, uncomment lines here to visualise them
     # graph1.visualise()
-    graph2.visualise()
+    # graph2.visualise()
+    print(graph1)
+    print(graph2)
     pass
