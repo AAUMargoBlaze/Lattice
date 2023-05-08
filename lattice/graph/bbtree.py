@@ -13,10 +13,9 @@ class BBTree(Tree):
     TODO: Current implementation creates an unbalanced tree, will probably have to look into a more clever solution for this
     """
     _frontier = []  # frontier queue defines which leaves should be added to next
-    _default_display_data = True  # binary tree nodes don't have labels, so we display the values instead
 
     def __init__(self, root_node):
-        root_node = root_node.copy()
+        root_node = root_node.copy(label=root_node.get_label())
         super().__init__(root_node, copy=False)
         self._frontier.append(root_node)
         self._frontier.append(root_node)
@@ -33,7 +32,7 @@ class BBTree(Tree):
         Nodes can only be added to the leaves of the tree
         We define the leaves as the frontier that can be added to
         """
-        new_node = node.copy()
+        new_node = node.copy(label=node.get_label())
         leaf_node = self._frontier.pop(0)
         self._nodes.add(new_node)
 

@@ -11,106 +11,97 @@ TODO:
 - Find a more elegant way to reference nodes in a graph for operations such as finding edges
 """
 import uuid
-from typing import Set, List, Dict
+from typing import List, Dict
 
 import graphviz
-from ..edge.edge import Edge
+from ..edge.visualedge import VisualEdge
 from ..node.node import Node
-
-# Prepend to node names to identify them against other attributes
-NODE_ID = '_node_'
 
 
 class Graph:
     # A set of exposed nodes to access when they are called for (NOTE: may not include all nodes)
-    _nodes: set
-    # If set to true, will display node pointers rather than labels
-    # CAREFUL: may lead to attempting displaying of large data types
-    _default_display_data: bool = False
+    _exposed_nodes: dict
+
+    def __init__(self):
+        self._nodes = {}  # initialise nodes as an empty set
+        self.fingerprint = uuid.uuid4()
 
     @property
-    def nodes(self) -> Set[Node]:
+    def nodes(self) -> Dict[str, Node]:
         """Return the exposed nodes that belong to this graph """
         return self._nodes
 
-    def __init__(self):
-        self._nodes = set()  # initialise nodes as an empty set
-        self.fingerprint = uuid.uuid4()
-
-    def add_nodes(self, *hidden_nodes: Node, **nodes: Node) -> List[Node]:
-        """Add nodes to a graph
-        Hidden nodes are nodes that have no labels attached, they can only be accessed during the context they are
-        defined in
-        Normal nodes require a key value pair, and can be accessed by looking at the 'nodes' property
-        To allow accessing hidden nodes, we return all added hidden nodes
-        """
-        added_hidden_nodes = []
-
+    def add_nodes(self, **nodes: Node):
+        """Exposed nodes are defined in key value pairs"""
         # add regular nodes
         for key, value in nodes.items():
-            name = NODE_ID + key
-            new_node = value.copy(key)
-            setattr(self, name, new_node)
-            self._nodes.add(new_node)
+            self._nodes[key] = value
 
-        # add hidden nodes
-        for hidden_node in hidden_nodes:
-            new_node = hidden_node.copy()
-            added_hidden_nodes.append(new_node)
-
-        return added_hidden_nodes
-
-    def add_node(self, node: Node, label: str = None):
-        """Create a node within the graph
-        If no label is provided, then the node is hidden, in order to interact with hidden nodes, we return the
-        created node within the context of the graph
-        """
-        if label:
-            name = NODE_ID + label
-            new_node = node.copy(label)
-            setattr(self, name, new_node)
-            self._nodes.add(new_node)
-
-        else:
-            new_node = node.copy()
-
-        return new_node
-
-    def add_edge(self, start_node: Node, end_node: Node, edge: Edge):
-        """
-        Add a relationship between two nodes inside the graph
-        """
-        start_node.add_successor(edge, end_node)
-        end_node.add_predecessor(edge, start_node)
+    def add_node(self, node: Node, label):
+        """Create a node within the graph"""
+        self._nodes[label] = node
 
     def get_node(self, name: str):
-        return getattr(self, NODE_ID + name)
+        return self._nodes.get(name)
 
-    def visualise(self, display_data: bool = None):
+    def deepcopy(self):
+        """Return a network of nodes encased by this graph, but copied"""
+        new_graph = Graph()
+        explored = {}
+        for name, node in self.nodes.items():
+            if node not in explored:
+                new_node = node.copy(label=node.get_label())
+                explored[node] = new_node
+                new_graph.add_nodes(**{name: new_node})
+                explored = self._recursive_copier(new_node, node, explored, new_graph)
+
+        return new_graph
+
+    def _recursive_copier(self, new_node, frontier_node, explored, graph):
+        """Explore each new node and copy it into a given graph"""
+        for edge, next_node in frontier_node.successors:
+            if next_node not in explored:
+                next_new_node = next_node.copy(label=next_node.get_label())
+                explored[next_node] = next_new_node
+                if next_node in self.nodes.values():
+                    node_name = list(self._nodes.keys())[list(self._nodes.values()).index(next_node)]
+                    graph.add_nodes(**{node_name: next_new_node})
+
+                explored = self._recursive_copier(next_new_node, next_node, explored, graph)
+
+            new_node.add_edge(edge, explored[next_node])
+        return explored
+
+    def visualise(self, fingerprint: str = None):
         """
-        Display nodes in the graph
-        For now, this only displays visible nodes (those stored in self._nodes)
+        Display visible nodes in the graph
+        Node names are set by the label of the node, rather than the key set by the graph
         """
-        display_data = display_data or self._default_display_data
-        runtime_fingerprint = uuid.uuid4()
+        # Create a new fingerprint for each visualisation to generate a single file per print
+        runtime_fingerprint = fingerprint or uuid.uuid4()
         dot = graphviz.Digraph(str(runtime_fingerprint))
-        for node in self.nodes:
-            if display_data:
-                origin_label = str(node.data)
-            else:
-                origin_label = node.get_label()
-            dot.node(str(node), label=origin_label)
-            for edge, next_node in node.successors:
-                dot.edge(str(node), str(next_node), label=str(edge.get_data()))
+        explored = []
+        for name, node in self.nodes.items():
+            if node not in explored:
+                explored = self._recursive_visualiser(node, explored, dot)
 
-        dot.render(view=True)
+        dot.render(directory='dot_output', view=True)
 
-    # PATHFINDING
+    def _recursive_visualiser(self, node, explored, dot):
+        """Visualise every node by exploring node connections"""
+        explored.append(node)
+        shape = 'circle'
+        if node in self._nodes.values():
+            shape = 'doublecircle'
+        dot.node(str(node), node.get_label(), shape=shape)
+        for edge, next_node in node.successors:
+            if isinstance(edge, VisualEdge):
+                dot.edge(str(node), str(next_node), label=str(edge.get_label()))
+                if next_node not in explored:
+                    explored = self._recursive_visualiser(next_node, explored, dot)
 
-    def search_djikstra(self, start_node, end_node):
-        """Perform a djikstra search between two nodes"""
-        pass
+        return explored
 
-    def __str__(self):
+    def __repr__(self):
         self.visualise()
         return "​"

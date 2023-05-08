@@ -1,4 +1,4 @@
-from .graph import Graph, NODE_ID
+from .graph import Graph
 from ..edge.edge import Edge
 
 
@@ -21,8 +21,7 @@ class Tree(Graph):
         A node must be added by specifying an existing node as a predecessor
         """
         for key, value in kwargs.items():
-            name = NODE_ID + key
             new_node = value.copy(key)
-            setattr(self, name, new_node)
+            setattr(self, key, new_node)
 
             self.add_edge(parent_node, new_node, edge)

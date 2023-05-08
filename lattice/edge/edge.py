@@ -13,9 +13,9 @@ class Edge:
     _data: Any
     _label: str
 
-    def __init__(self):
-        self._data = ""
-        self._label = ""
+    def __init__(self, label=''):
+        self._data = None
+        self._label = label
 
     def get_data(self) -> Any:
         """Get the data we have stored in the edge"""
