@@ -11,7 +11,8 @@ TODO:
 - Find a more elegant way to reference nodes in a graph for operations such as finding edges
 """
 import uuid
-from typing import List, Dict
+import os
+from typing import List, Dict, Callable
 
 import graphviz
 from ..edge.visualedge import VisualEdge
@@ -85,9 +86,9 @@ class Graph:
             if node not in explored:
                 explored = self._recursive_visualiser(node, explored, dot)
 
-        dot.render(directory='dot_output', view=True)
+        return dot
 
-    def _recursive_visualiser(self, node, explored, dot):
+    def _recursive_visualiser(self, node: Node, explored: List[Node], dot):
         """Visualise every node by exploring node connections"""
         explored.append(node)
         shape = 'circle'
@@ -102,6 +103,26 @@ class Graph:
 
         return explored
 
+    def apply(self, func):
+        """Apply a function flatly to every node in the network"""
+        explored = []
+        for node in self.nodes.values():
+            if node not in explored:
+                explored = self._recursive_apply(node, func, explored)
+
+    def _recursive_apply(self, node: Node, func: Callable, explored: List[Node]):
+        """Apply the function to this node then call this function on every connected node"""
+        explored.append(node)
+        node.data = func(node.data)
+        for edge, next_node in node.successors:
+            if next_node not in explored:
+                self._recursive_apply(next_node, func, explored)
+
+        return explored
+
     def __repr__(self):
-        self.visualise()
+        graphoutput = self.visualise()
+        dotoutput = graphoutput.pipe(format='dot', encoding='utf-8')
+        os.system('echo \'' + dotoutput + '\' | graph-easy --from=dot --as_ascii')
+        # graphoutput.render(view=True)
         return "​"
